@@ -66,8 +66,8 @@ coverage.xml
 .DS_Store
 
 # models/
-models/*.joblib
-models/*.pkl
+# models/*.joblib
+# models/*.pkl
 
 # data/ - se os dados forem grandes
 # data/
