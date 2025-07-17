@@ -1,0 +1,64 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+*.ipynb
+logs/
+tests/
+dataexample/
+trainingdata/
+.DS_Store
+.venv/
+.env
+*.ipynb_checkpoints
+*.joblib
+*.pkl
+; uv.lock
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+.hypothesis/
+.pytest_cache/
+*.egg-info/
+.git/
+.gitignore
+Dockerfile
+README.md
+notebooks/
+docs/
+# Arquivos temporários da Action
+training_output.txt
+metrics.json
+dashboard.html
+metrics_history/
+scripts/
+
+# GitHub
+.github/
+.git/
+
+# Documentação
+README.md
+docs/
+
+# Arquivos de desenvolvimento
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+.pytest_cache/
+# Adicione outros arquivos/pastas que não precisam ir para a imagem
+trainingdata/
+dataexample/
+*/data/raw/*
+*/data/processed/*
