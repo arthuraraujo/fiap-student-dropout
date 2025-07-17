@@ -17,13 +17,13 @@ RUN uv venv /opt/venv && \
 # Estágio 2: Imagem final de produção
 FROM python:3.12-slim AS production
 
-WORKDIR /app
-
 # Copia apenas o ambiente virtual com as dependências do estágio anterior
 COPY --from=builder /opt/venv /opt/venv
 
 # Adiciona o venv ao PATH para que os executáveis sejam encontrados
 ENV PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
 
 # Cria um usuário não-root para segurança
 RUN useradd --create-home app
@@ -38,5 +38,5 @@ COPY --chown=app:app models/ ./models/
 # Expõe a porta padrão do Streamlit
 EXPOSE 8501
 
-# Comando para iniciar a aplicação
-CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Comando para iniciar a aplicação (CORRIGIDO com caminho absoluto)
+CMD ["/opt/venv/bin/streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
