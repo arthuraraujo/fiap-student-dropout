@@ -97,7 +97,7 @@ metrics_history/
 data/processed/
 # data/raw/
 # src/data/raw
-*/models/*
+# */models/*
 */data/processed/*
 
 # NÃO adicione arquivos grandes (>50MB) ou sensíveis ao repositório!
