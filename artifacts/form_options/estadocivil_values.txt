@@ -1,0 +1,6 @@
+Casado
+Divorciado
+Separado Judicialmente
+Solteiro
+União de Fato
+Viúvo

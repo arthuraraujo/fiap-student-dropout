@@ -7,38 +7,33 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, roc_auc_score
+from pathlib import Path # Adicionado
 
-# --- Configuração ---
-# Caminhos para os dados processados e para salvar o modelo
-PROCESSED_DATA_DIR = '../data/processed'
-MODEL_OUTPUT_DIR = '../models'
+# --- Configuração de Caminhos (CORRIGIDO) ---
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+PROCESSED_DATA_DIR = PROJECT_ROOT / 'data' / 'processed'
+MODEL_OUTPUT_DIR = PROJECT_ROOT / 'models'
 MODEL_FILENAME = 'dropout_classifier_v1.pkl'
 CONFUSION_MATRIX_FILENAME = 'confusion_matrix_v1.png'
 
 # Parâmetros do Modelo
-# RandomForest é um bom ponto de partida: robusto e bom desempenho.
-# `class_weight='balanced'` é MUITO IMPORTANTE para dados desbalanceados 
-# (quando temos muito mais 'Graduados' do que 'Desistentes', ou vice-versa).
 MODEL_PARAMS = {
     'n_estimators': 100,
     'max_depth': 10,
     'random_state': 42,
-    'class_weight': 'balanced' 
+    'class_weight': 'balanced'
 }
 
 def train_model():
     """
-    Orquestra o pipeline de treinamento do modelo:
-    1. Carrega os dados de treino e teste.
-    2. Treina um modelo RandomForestClassifier.
-    3. Avalia o modelo e imprime as métricas.
-    4. Salva o modelo treinado e a matriz de confusão.
+    Orquestra o pipeline de treinamento do modelo.
     """
-    print("🚀 Iniciando o pipeline de treinamento do modelo...")
+    print("🧠 Iniciando o pipeline de treinamento do modelo...")
 
     # --- 1. Carregamento dos Dados ---
     try:
-        print(f"🔄 Carregando dados do diretório '{PROCESSED_DATA_DIR}'...")
+        print(f"📥 Carregando dados do diretório '{PROCESSED_DATA_DIR}'...")
         X_train = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, 'X_train.csv'))
         y_train = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, 'y_train.csv'))
         X_test = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, 'X_test.csv'))
@@ -50,8 +45,7 @@ def train_model():
         return
 
     # --- 2. Treinamento do Modelo ---
-    print(f"🧠 Treinando o modelo RandomForestClassifier...")
-    # O .values.ravel() ajusta o formato de y_train para o que o scikit-learn espera.
+    print(f"🏋️ Treinando o modelo RandomForestClassifier...")
     model = RandomForestClassifier(**MODEL_PARAMS)
     model.fit(X_train, y_train.values.ravel())
     print("✅ Modelo treinado com sucesso.")
@@ -67,8 +61,7 @@ def train_model():
     print(f"  - ROC AUC Score: {roc_auc:.4f}")
     
     print("\n  - Relatório de Classificação:")
-    # Lembre-se: classe 1 = Desistente, classe 0 = Graduado
-    print(classification_report(y_test, y_pred))
+    print(classification_report(y_test, y_pred, target_names=['Graduado', 'Desistente']))
 
     # --- 4. Salvando os Artefatos (Modelo e Gráfico) ---
     print("💾 Salvando o modelo treinado e a matriz de confusão...")
@@ -91,8 +84,7 @@ def train_model():
     plt.savefig(cm_path)
     print(f"   - Gráfico da Matriz de Confusão salvo em: '{cm_path}'")
     
-    print("\n🎉 Pipeline de treinamento concluído!")
-
+    print("\n✅ Pipeline de treinamento concluído!")
 
 if __name__ == "__main__":
     train_model()

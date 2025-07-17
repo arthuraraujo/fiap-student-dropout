@@ -1,89 +1,42 @@
-# Multi-stage Dockerfile ultra-otimizado para apenas 512MB RAM
-FROM python:3.12-slim AS base
+# Estágio 1: Instalar dependências
+FROM python:3.12-slim AS builder
 
-# Instalar apenas o essencial
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
-
-# Instalar UV
-RUN pip install --no-cache-dir uv==0.4.18
-
-WORKDIR /app
-
-# === STAGE 1: Dependencies ===
-FROM base AS deps
-
-COPY pyproject.toml uv.lock* ./
-
-RUN uv venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH" 
-
-# Instalar dependências com versões mais leves quando possível
-RUN uv pip install --no-cache-dir \
-    flask==2.3.3 \
-    flask-restx==1.2.0 \
-    pandas==2.0.3 \
-    scikit-learn==1.3.0 \
-    joblib==1.3.2 \
-    numpy==1.24.4 \
-    python-dateutil==2.8.2 \
-    gunicorn==21.2.0
-
-# === STAGE 2: Production ===
-FROM base AS production
-
-COPY --from=deps /opt/venv /opt/venv
-
-# Configurações críticas para 512MB
-ENV PATH="/opt/venv/bin:$PATH"
-ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONHASHSEED=random
-# Limitar uso de memória do Python
-ENV MALLOC_TRIM_THRESHOLD_=100000
-ENV MALLOC_MMAP_THRESHOLD_=100000
-# Configurações para otimizar garbage collection
-ENV PYTHONGC=1
+ENV PYTHONUNBUFFERED=1
 
-RUN mkdir -p logs models data/processed data/raw
+# Instala o uv
+RUN pip install --no-cache-dir uv
 
-RUN useradd --create-home --shell /bin/bash app
-RUN chown -R app:app logs models data
-
-USER app
 WORKDIR /app
 
+# Copia os arquivos de dependência e cria o ambiente virtual
+COPY pyproject.toml uv.lock* ./
+RUN uv venv /opt/venv && \
+    uv sync --no-cache --python /opt/venv/bin/python
+
+# Estágio 2: Imagem final de produção
+FROM python:3.12-slim AS production
+
+WORKDIR /app
+
+# Copia apenas o ambiente virtual com as dependências do estágio anterior
+COPY --from=builder /opt/venv /opt/venv
+
+# Adiciona o venv ao PATH para que os executáveis sejam encontrados
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Cria um usuário não-root para segurança
+RUN useradd --create-home app
+USER app
+
+# Copia os artefatos e o código-fonte da aplicação
 COPY --chown=app:app src/ ./src/
-COPY --chown=app:app pyproject.toml ./
+COPY --chown=app:app artifacts/ ./artifacts/
+COPY --chown=app:app data/ ./data/
+COPY --chown=app:app models/ ./models/
 
+# Expõe a porta padrão do Streamlit
+EXPOSE 8501
 
-
-# Health check com timeout maior
-HEALTHCHECK --interval=60s --timeout=30s --start-period=60s --retries=2 \
-    CMD curl -f http://localhost:5050/api/health || exit 1
-
-LABEL org.opencontainers.image.title="Datathon Decision API"
-LABEL org.opencontainers.image.description="ML API for recruitment decisions"
-
-EXPOSE 5050
-
-# Configuração ULTRA-CONSERVADORA para 512MB
-CMD ["/opt/venv/bin/gunicorn", \
-     "--bind", "0.0.0.0:5050", \
-     "--workers", "1", \
-     "--worker-class", "sync", \
-     "--timeout", "300", \
-     "--graceful-timeout", "60", \
-     "--keep-alive", "2", \
-     "--max-requests", "50", \
-     "--max-requests-jitter", "10", \
-     "--worker-tmp-dir", "/dev/shm", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-", \
-     "--log-level", "warning", \
-     "--limit-request-line", "2048", \
-     "--limit-request-fields", "50", \
-     "--limit-request-field-size", "2048", \
-     "src.src.app:app"]
+# Comando para iniciar a aplicação
+CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]

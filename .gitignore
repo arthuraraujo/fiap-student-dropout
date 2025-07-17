@@ -102,3 +102,5 @@ data/processed/
 
 # NÃO adicione arquivos grandes (>50MB) ou sensíveis ao repositório!
 # Para dados brutos, mantenha apenas exemplos pequenos em data/raw/ se necessário.
+
+data/processed/**

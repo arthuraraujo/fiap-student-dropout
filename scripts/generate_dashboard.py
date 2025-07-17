@@ -158,7 +158,7 @@ def generate_dashboard_html(metrics: dict, commit_sha: str, branch: str, run_id:
         <div class="header">
             <h1>🤖 Model Performance Dashboard</h1>
             <div class="subtitle">
-                <strong>Datathon Decision ML Pipeline</strong><br>
+                <strong>FIAP ML 03</strong><br>
                 Last Updated: {current_time}
             </div>
         </div>
@@ -273,7 +273,7 @@ def generate_dashboard_html(metrics: dict, commit_sha: str, branch: str, run_id:
         
         <div class="footer">
             <p>Generated automatically by GitHub Actions 🤖</p>
-            <p>Datathon Decision ML Pipeline</p>
+            <p>ML 03</p>
         </div>
     </div>
 </body>

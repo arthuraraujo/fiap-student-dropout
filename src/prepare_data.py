@@ -1,13 +1,17 @@
-# prepare_data.py (Versão 4 - com Engenharia de Features)
+# src/prepare_data.py
 
 import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
+from pathlib import Path # Adicionado
 
-# --- Configuração ---
-RAW_DATA_PATH = '../data/raw/data.csv'
-PROCESSED_DATA_DIR = '../data/processed'
+# --- Configuração de Caminhos (CORRIGIDO) ---
+# Constrói o caminho absoluto a partir da localização do script
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+RAW_DATA_PATH = PROJECT_ROOT / 'data' / 'raw' / 'data.csv'
+PROCESSED_DATA_DIR = PROJECT_ROOT / 'data' / 'processed'
 
 # --- Parâmetros ---
 TARGET_COLUMN = 'Target'
@@ -43,7 +47,7 @@ def main():
         return
 
     # --- Limpeza da Variável Alvo ---
-    print("🧼 Limpando a coluna alvo...")
+    print("🧹 Limpando a coluna alvo...")
     df[TARGET_COLUMN] = df[TARGET_COLUMN].astype(str).str.strip()
     expected_values = [POSITIVE_CLASS, NEGATIVE_CLASS]
     df = df[df[TARGET_COLUMN].isin(expected_values)].copy()
@@ -60,7 +64,7 @@ def main():
     print("   - Colunas originais 'QualificacaoAnterior' e 'QualificacaoAnteriorGrau' removidas.")
 
     # --- Pré-processamento das Features ---
-    print("🛠️  Realizando pré-processamento (imputação e encoding)...")
+    print("⚙️ Realizando pré-processamento (imputação e encoding)...")
     X = df.drop(TARGET_COLUMN, axis=1)
     y = df[TARGET_COLUMN]
     
@@ -88,8 +92,8 @@ def main():
     y_train.to_csv(os.path.join(PROCESSED_DATA_DIR, 'y_train.csv'), index=False)
     y_test.to_csv(os.path.join(PROCESSED_DATA_DIR, 'y_test.csv'), index=False)
     
-    print(f"💾 Arquivos processados salvos em '{PROCESSED_DATA_DIR}'")
-    print("\n🎉 Pipeline de preparação de dados (v4) concluído!")
+    print(f"📦 Arquivos processados salvos em '{PROCESSED_DATA_DIR}'")
+    print("\n✅ Pipeline de preparação de dados (v4) concluído!")
 
 if __name__ == "__main__":
     main()
