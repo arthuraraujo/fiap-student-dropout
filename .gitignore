@@ -94,13 +94,13 @@ dashboard.html
 metrics_history/
 
 # Dados processados (não versionar)
-data/processed/
+# data/processed/
 # data/raw/
 # src/data/raw
 # */models/*
-*/data/processed/*
+# */data/processed/*
 
 # NÃO adicione arquivos grandes (>50MB) ou sensíveis ao repositório!
 # Para dados brutos, mantenha apenas exemplos pequenos em data/raw/ se necessário.
 
-data/processed/**
+# data/processed/**
